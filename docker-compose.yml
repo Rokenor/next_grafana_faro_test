@@ -1,0 +1,79 @@
+version: '3.8'
+
+networks:
+  monitoring_network:
+    driver: bridge
+
+volumes:
+  loki_data:
+  grafana_data:
+
+services:
+  # Your Next.js Application
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: next-grafana-faro-app
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     NODE_ENV: dev
+  #     # Updated Faro URL to point to the OpenTelemetry Collector
+  #     NEXT_PUBLIC_FARO_URL: http://otel-collector:4318 # Faro sends to OTLP HTTP endpoint
+  #     # NEXT_PUBLIC_FARO_API_KEY: ${NEXT_PUBLIC_FARO_API_KEY} # If your collector requires auth
+  #   restart: unless-stopped
+  #   networks:
+  #     - monitoring_network
+  #   depends_on:
+  #     - otel-collector
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest # Using contrib for more exporters like Loki
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver (used by Faro)
+      - "13133:13133" # Health Check extension
+      - "55679:55679" # zPages extension
+    networks:
+      - monitoring_network
+    depends_on:
+      - loki
+
+  # Loki for log aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki_data:/loki
+    ports:
+      - "3100:3100" # Loki HTTP port
+    networks:
+      - monitoring_network
+    restart: unless-stopped
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3001:3000" # Grafana web interface (using 3001 to avoid conflict with app)
+    networks:
+      - monitoring_network
+    restart: unless-stopped
+    depends_on:
+      - loki

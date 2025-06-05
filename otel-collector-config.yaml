@@ -1,0 +1,50 @@
+receivers:
+  otlp:
+    protocols:
+      grpc: # Port 4317
+      http: # Port 4318 (used by Grafana Faro)
+
+processors:
+  batch:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 75
+    spike_limit_percentage: 15
+
+exporters:
+  otlphttp/logs:
+    endpoint: "http://loki:3100/otlp"
+    tls:
+      insecure: true
+  # loki:
+    # endpoint: "http://loki:3100/loki/api/v1/push"
+    # Optional: Add labels that will be applied to all logs
+    # default_labels_enabled:
+    #   exporter: true
+    #   job: true
+    #   instance: true
+    #   level: true
+    # tls:
+    #   insecure: true # set to false if Loki has TLS enabled
+
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/logs] # Add 'logging' here if you want to see collector logs for OTLP data
+    # You can also define pipelines for traces and metrics here
+    # traces:
+    #   receivers: [otlp]
+    #   processors: [memory_limiter, batch]
+    #   exporters: [logging] # Replace with your trace backend exporter
+    # metrics:
+    #   receivers: [otlp]
+    #   processors: [memory_limiter, batch]
+    #   exporters: [logging] # Replace with your metrics backend exporter
+
+  # # Optional: extensions for health checking and internal metrics
+  # extensions: [health_check, zpages]
+  # telemetry:
+  #   logs:
+  #     level: "info" # Collector's own logs
