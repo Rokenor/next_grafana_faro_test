@@ -9,28 +9,9 @@ volumes:
   grafana_data:
 
 services:
-  # Your Next.js Application
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: next-grafana-faro-app
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     NODE_ENV: dev
-  #     # Updated Faro URL to point to the OpenTelemetry Collector
-  #     NEXT_PUBLIC_FARO_URL: http://otel-collector:4318 # Faro sends to OTLP HTTP endpoint
-  #     # NEXT_PUBLIC_FARO_API_KEY: ${NEXT_PUBLIC_FARO_API_KEY} # If your collector requires auth
-  #   restart: unless-stopped
-  #   networks:
-  #     - monitoring_network
-  #   depends_on:
-  #     - otel-collector
-
   # OpenTelemetry Collector
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest # Using contrib for more exporters like Loki
+    image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
@@ -44,6 +25,7 @@ services:
       - monitoring_network
     depends_on:
       - loki
+      - jaeger # Added dependency
 
   # Loki for log aggregation
   loki:
@@ -71,9 +53,21 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
     ports:
-      - "3001:3000" # Grafana web interface (using 3001 to avoid conflict with app)
+      - "3001:3000" # Grafana web interface
     networks:
       - monitoring_network
     restart: unless-stopped
     depends_on:
       - loki
+
+  # Jaeger for tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14250:14250" # Jaeger gRPC receiver
+      - "43177:4317" # Jaeger OTLP receiver
+    networks:
+      - monitoring_network
+    restart: unless-stopped
