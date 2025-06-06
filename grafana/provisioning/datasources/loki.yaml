@@ -1,3 +1,4 @@
+# Save this as ./grafana/provisioning/datasources/datasources.yml
 apiVersion: 1
 
 datasources:
@@ -5,6 +6,34 @@ datasources:
     type: loki
     access: proxy
     url: http://loki:3100
+    isDefault: false
+    editable: true
+
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    isDefault: false
+    editable: true
     jsonData:
-      maxLines: 1000
-    isDefault: true # Optional: make it the default datasource
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: 'loki_uid'
+        tags: ['job', 'instance', 'pod', 'namespace']
+        mappedTags: [
+          { key: 'service.name', value: 'service' },
+          { key: 'service.namespace', value: 'namespace' }
+        ]
+        mapTagNamesEnabled: true
+        spanStartTimeShift: '1h'
+        spanEndTimeShift: '1h'
+        filterByTraceID: true
+        filterBySpanID: true
+
+  # Optional: Add Tempo if you want a more advanced tracing backend
+  # - name: Tempo
+  #   type: tempo
+  #   access: proxy
+  #   url: http://tempo:3200
+  #   isDefault: false
+  #   editable: true

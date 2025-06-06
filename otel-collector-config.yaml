@@ -24,6 +24,10 @@ exporters:
     endpoint: "http://loki:3100/loki/api/v1/push"
     tls:
       insecure: true
+  otlp/jaeger:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
 
 extensions:
   health_check:
@@ -36,18 +40,13 @@ service:
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [debug, loki] # Using debug exporter for debugging
-    # You can also define pipelines for traces and metrics here
-    # traces:
-    #   receivers: [otlp]
-    #   processors: [memory_limiter, batch]
-    #   exporters: [logging] # Replace with your trace backend exporter
-    # metrics:
-    #   receivers: [otlp]
-    #   processors: [memory_limiter, batch]
-    #   exporters: [logging] # Replace with your metrics backend exporter
+      exporters: [debug, loki]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [debug, otlp/jaeger] # Export traces to Jaeger
 
   extensions: [health_check, zpages]
   telemetry:
     logs:
-      level: "debug" # Enable debug logging for the collector
+      level: "debug"
