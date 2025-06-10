@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "Next.js Faro Dashboards"
+    orgId: 1
+    folder: "Next.js Monitoring"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
