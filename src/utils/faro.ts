@@ -2,8 +2,9 @@ import {
   EventAttributes,
   Faro,
   getWebInstrumentations,
+  WebVitalsInstrumentation,
 } from "@grafana/faro-web-sdk";
-import { TracingInstrumentation } from '@grafana/faro-web-tracing';
+import { TracingInstrumentation } from "@grafana/faro-web-tracing";
 
 let faro: Faro | null = null;
 
@@ -23,6 +24,8 @@ if (typeof window !== "undefined") {
             ...getWebInstrumentations(),
             // Add the TracingInstrumentation
             new TracingInstrumentation(),
+            // Add Web Vitals instrumentation
+            new WebVitalsInstrumentation(),
           ],
           transports: [
             new OtlpHttpTransport({
@@ -57,7 +60,7 @@ export const traceOperation = (name: string, fn: () => void) => {
   if (otel) {
     const { trace } = otel;
     // You can name your tracer to distinguish it from others
-    const tracer = trace.getTracer('custom-operations');
+    const tracer = trace.getTracer("custom-operations");
     tracer.startActiveSpan(name, (span) => {
       // Execute the function within the span
       fn();

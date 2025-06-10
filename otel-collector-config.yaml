@@ -11,11 +11,36 @@ receivers:
           max_age: 7200
 
 processors:
-  batch:
+  batch: {}
   memory_limiter:
     check_interval: 1s
     limit_percentage: 75
     spike_limit_percentage: 15
+  transform:
+    trace_statements:
+      - context: span
+        statements:
+          - set(attributes["measurement.type"], "web-vitals") where name == "web-vitals"
+          - set(attributes["measurement.name"], attributes["name"]) where name == "web-vitals"
+          - set(attributes["measurement.value"], attributes["value"]) where name == "web-vitals"
+          - set(attributes["measurement.rating"], attributes["rating"]) where name == "web-vitals"
+    log_statements:
+      - context: log
+        statements:
+          - set(attributes["measurement.type"], attributes["measurement.type"]) where attributes["measurement.type"] != nil
+          - set(attributes["measurement.name"], attributes["measurement.name"]) where attributes["measurement.name"] != nil
+          - set(attributes["measurement.value"], attributes["measurement.value"]) where attributes["measurement.value"] != nil
+          - set(attributes["measurement.rating"], attributes["measurement.rating"]) where attributes["measurement.rating"] != nil
+          - set(attributes["measurement.id"], attributes["measurement.id"]) where attributes["measurement.id"] != nil
+          - set(attributes["measurement.navigation_entry_id"], attributes["measurement.navigation_entry_id"]) where attributes["measurement.navigation_entry_id"] != nil
+          - set(attributes["measurement.navigation_type"], attributes["measurement.navigation_type"]) where attributes["measurement.navigation_type"] != nil
+          - set(attributes["measurement.element"], attributes["measurement.element"]) where attributes["measurement.element"] != nil
+          - set(attributes["measurement.event_target"], attributes["measurement.event_target"]) where attributes["measurement.event_target"] != nil
+          - set(attributes["measurement.event_type"], attributes["measurement.event_type"]) where attributes["measurement.event_type"] != nil
+          - set(attributes["measurement.load_state"], attributes["measurement.load_state"]) where attributes["measurement.load_state"] != nil
+          - set(attributes["measurement.interaction_target"], attributes["measurement.interaction_target"]) where attributes["measurement.interaction_target"] != nil
+          - set(attributes["measurement.interaction_type"], attributes["measurement.interaction_type"]) where attributes["measurement.interaction_type"] != nil
+          - set(attributes["measurement.faro_measurement_context"], attributes["faro.measurement.context"]) where attributes["faro.measurement.context"] != nil
 
 exporters:
   debug:
@@ -28,6 +53,8 @@ exporters:
     endpoint: "jaeger:4317"
     tls:
       insecure: true
+  prometheus:
+    endpoint: "0.0.0.0:8889"
 
 extensions:
   health_check:
@@ -39,12 +66,16 @@ service:
   pipelines:
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, batch, transform]
       exporters: [debug, loki]
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [debug, otlp/jaeger] # Export traces to Jaeger
+      processors: [memory_limiter, batch, transform]
+      exporters: [debug, otlp/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, transform]
+      exporters: [debug, prometheus]
 
   extensions: [health_check, zpages]
   telemetry:
