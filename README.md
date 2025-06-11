@@ -91,6 +91,76 @@ The application will be available at `http://localhost:3000`.
   - Password: `admin`
 - Pre-configured with Loki data source
 
+## Grafana Dashboard Setup
+
+1. Log in to Grafana at `http://localhost:3001`
+2. Navigate to Dashboards
+3. Open the "Faro Dashboard" which includes:
+   - Service Activity panel (full width)
+   - Logs & Events (Timeline) panel showing log frequency over time
+   - Errors (Timeline) panel with error frequency visualization
+   - Logs & Events table panel with detailed log entries
+   - Errors table panel showing error logs
+   - Web Vitals panels for performance metrics
+4. Each panel includes data links to open detailed queries in Loki
+
+## Project Structure
+
+```
+├── src/
+│   ├── app/
+│   │   └── page.tsx          # Main landing page with monitoring demo and test error generation
+│   └── utils/
+│       └── faro.ts           # Grafana Faro configuration and utilities
+├── docker-compose.yml        # Docker services configuration
+├── otel-collector-config.yaml # OpenTelemetry Collector configuration
+├── loki-config.yaml         # Loki configuration
+├── grafana/
+│   └── provisioning/        # Grafana provisioning (data sources, dashboards)
+│       └── dashboards/
+│           └── faro-dashboard.json # Pre-configured Grafana dashboard
+├── .env.local              # Environment configuration (create this file)
+├── package.json
+└── README.md
+```
+
+## Recent Changes
+
+### Dashboard Enhancements
+
+- Added new timeline panels for better log visualization:
+  - "Logs & Events (Timeline)" panel showing log frequency over time
+  - "Errors (Timeline)" panel with red line color for error visualization
+- Improved panel layout and organization:
+  - Service Activity panel spans full width at the top
+  - Timeline panels for logs and errors
+  - Detailed log and error tables below
+  - Web Vitals panels at the bottom
+- Added data links to all panels for quick access to Loki queries
+- Configured proper color schemes and thresholds for better visualization
+
+### Monitoring Improvements
+
+- Added test error generation functionality:
+  - Automatic error generation on component mount
+  - Manual error generation via button click
+  - Proper error level detection and logging
+- Enhanced log filtering and visualization:
+  - Improved log level detection
+  - Better error log filtering
+  - Structured log display in panels
+
+### Infrastructure Updates
+
+- Updated OpenTelemetry Collector configuration:
+  - Added proper CORS support for browser requests
+  - Configured endpoints to bind to all interfaces (0.0.0.0)
+  - Added health check and zpages extensions
+  - Improved logging configuration
+- Added Docker Compose setup for complete observability stack
+- Integrated Loki for log aggregation
+- Pre-configured Grafana with Loki data source and dashboard
+
 ## Testing the Monitoring
 
 The demo page includes interactive elements to test the monitoring:
@@ -102,51 +172,16 @@ The demo page includes interactive elements to test the monitoring:
    - Log the event in Loki
    - Display the event in Grafana
 
-2. **Trigger Demo Error**: Clicking this button will:
-   - Generate a sample error
+2. **Trigger Test Error**: Clicking this button will:
+
+   - Generate a test error
    - Send the error details to Grafana Faro
    - Log the error in Loki
-   - Display the error in Grafana
+   - Display the error in both timeline and table panels
 
-## Grafana Dashboard Setup
-
-1. Log in to Grafana at `http://localhost:3001`
-2. Navigate to the Explore section
-3. Select the Loki data source
-4. Create queries to view:
-   - Application logs
-   - Error events
-   - Custom events
-   - Performance metrics
-
-## Project Structure
-
-```
-├── src/
-│   ├── app/
-│   │   └── page.tsx          # Main landing page with monitoring demo
-│   └── utils/
-│       └── faro.ts           # Grafana Faro configuration and utilities
-├── docker-compose.yml        # Docker services configuration
-├── otel-collector-config.yaml # OpenTelemetry Collector configuration
-├── loki-config.yaml         # Loki configuration
-├── grafana/
-│   └── provisioning/        # Grafana provisioning (data sources, etc.)
-├── .env.local              # Environment configuration (create this file)
-├── package.json
-└── README.md
-```
-
-## Recent Changes
-
-- Updated OpenTelemetry Collector configuration:
-  - Added proper CORS support for browser requests
-  - Configured endpoints to bind to all interfaces (0.0.0.0)
-  - Added health check and zpages extensions
-  - Improved logging configuration
-- Added Docker Compose setup for complete observability stack
-- Integrated Loki for log aggregation
-- Pre-configured Grafana with Loki data source
+3. **Automatic Error Generation**:
+   - A test error is automatically generated when the page loads
+   - This helps verify the monitoring setup is working correctly
 
 ## Troubleshooting
 
