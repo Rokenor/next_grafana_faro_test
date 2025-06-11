@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logError, logEvent, traceOperation } from "@/utils/faro";
 
 export default function Home() {
   const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    // (Optional) Log a test error on mount (or on a timer) so that the “Errors” panel shows data.
+    console.error("Test error (generated) – (via useEffect)");
+  }, []);
 
   const handleIncrement = () => {
     setCounter((prev) => prev + 1);
@@ -45,6 +50,10 @@ export default function Home() {
     });
   };
 
+  const handleTestError = () => {
+    console.error("Test error (generated) – (via button click)");
+  };
+
   return (
     <main className="min-h-screen p-8 bg-gradient-to-b from-gray-900 to-blue-950">
       {/* ... (rest of your component code is unchanged) ... */}
@@ -72,6 +81,12 @@ export default function Home() {
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors border border-green-500/30"
             >
               Send Custom Trace
+            </button>
+            <button
+              onClick={handleTestError}
+              className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors border border-yellow-500/30"
+            >
+              Generate Test Error (for “Errors” Panel)
             </button>
           </div>
           <p className="text-sm text-gray-400">

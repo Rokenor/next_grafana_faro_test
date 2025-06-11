@@ -10,257 +10,26 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
+      "title": "Service Activity",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
+          "color": { "mode": "thresholds" },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
-      "id": 1,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "editorMode": "code",
-          "expr": "{exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"}",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Logs",
-      "type": "logs"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "displayLabels": ["percent"],
-        "legend": {
-          "displayMode": "list",
-          "placement": "right",
-          "showLegend": true,
-          "values": ["percent"]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "editorMode": "code",
-          "expr": "{exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"}",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Errors",
-      "type": "logs"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 1
-              }
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1800 },
+              { "color": "red", "value": 3000 }
             ]
           },
           "unit": "ms"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 3,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "editorMode": "code",
-          "expr": "{exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"}",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Events",
-      "type": "logs"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1800
-              },
-              {
-                "color": "red",
-                "value": 3000
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 16
-      },
-      "id": 5,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -276,10 +45,7 @@
       "pluginVersion": "10.0.0",
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
+          "datasource": { "type": "loki", "uid": "loki" },
           "editorMode": "code",
           "expr": "sum by (service_name) (count_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | __error__=\"\" [5m]))",
           "legendFormat": "{{service_name}}",
@@ -287,51 +53,33 @@
           "refId": "A"
         }
       ],
-      "title": "Service Activity",
-      "type": "timeseries"
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"sum by (service_name) (count_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | __error__=\\\"\\\" [5m]))\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
     },
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
+      "title": "Logs & Events (Timeline)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": { "mode": "thresholds" },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 2500
-              },
-              {
-                "color": "red",
-                "value": 4000
-              }
-            ]
+            "steps": [{ "color": "green", "value": null }]
           },
-          "unit": "ms"
+          "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 24
-      },
-      "id": 6,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "line",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
@@ -344,62 +92,41 @@
       "pluginVersion": "10.0.0",
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
+          "datasource": { "type": "loki", "uid": "loki" },
           "editorMode": "code",
-          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | measurement.type=\"web-vitals\" | measurement.name=\"lcp\" | __error__=\"\" | unwrap measurement.value [5m])",
-          "legendFormat": "LCP",
+          "expr": "count_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json [5m])",
+          "legendFormat": "Logs (count)",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Largest Contentful Paint (LCP)",
-      "type": "stat"
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"count_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json [5m])\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
     },
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
+      "title": "Errors (Timeline)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 16, "w": 24, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": { "mode": "fixed", "fixedColor": "red" },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 100
-              },
-              {
-                "color": "red",
-                "value": 300
-              }
-            ]
+            "steps": [{ "color": "green", "value": null }]
           },
-          "unit": "ms"
+          "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 16
-      },
-      "id": 7,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "line",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
@@ -412,291 +139,148 @@
       "pluginVersion": "10.0.0",
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
+          "datasource": { "type": "loki", "uid": "loki" },
           "editorMode": "code",
-          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | measurement.type=\"web-vitals\" | measurement.name=\"fid\" | __error__=\"\" | unwrap measurement.value [5m])",
-          "legendFormat": "FID",
+          "expr": "count_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | detected_level=\"error\" [5m])",
+          "legendFormat": "Errors (count)",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "First Input Delay (FID)",
-      "type": "stat"
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"count_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | detected_level=\\\"error\\\" [5m])\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
     },
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
+      "title": "Logs & Events",
+      "type": "logs",
+      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": { "mode": "thresholds" },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 0.1
-              },
-              {
-                "color": "red",
-                "value": 0.25
-              }
-            ]
+            "steps": [{ "color": "green", "value": null }]
           },
-          "unit": "none"
+          "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 24
-      },
-      "id": 8,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["mean", "max", "p95"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
+      "options": { "displayMode": "json" },
       "pluginVersion": "10.0.0",
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
+          "datasource": { "type": "loki", "uid": "loki" },
           "editorMode": "code",
-          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | measurement.type=\"web-vitals\" | measurement.name=\"cls\" | __error__=\"\" | unwrap measurement.value [5m])",
-          "legendFormat": "CLS",
+          "expr": "{exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Cumulative Layout Shift (CLS)",
-      "type": "stat"
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"{exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
     },
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1800
-              },
-              {
-                "color": "red",
-                "value": 3000
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 24
-      },
-      "id": 9,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["mean", "max", "p95"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.0",
+      "title": "Errors",
+      "type": "table",
+      "gridPos": { "x": 16, "y": 24, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
+          "datasource": { "type": "loki", "uid": "loki" },
           "editorMode": "code",
-          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | measurement.type=\"web-vitals\" | measurement.name=\"ttfb\" | __error__=\"\" | unwrap measurement.value [5m])",
-          "legendFormat": "TTFB",
+          "expr": "{exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | detected_level=\"error\"",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Time to First Byte (TTFB)",
-      "type": "stat"
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"{exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | detected_level=\\\"error\\\"\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
     },
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1800
-              },
-              {
-                "color": "red",
-                "value": 3000
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 32
-      },
-      "id": 10,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["mean", "max", "p95"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.0",
+      "title": "Web Vitals (LCP)",
+      "type": "gauge",
+      "gridPos": { "x": 0, "y": 32, "w": 6, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | measurement.type=\"web-vitals\" | measurement.name=\"fcp\" | __error__=\"\" | unwrap measurement.value [5m])",
-          "legendFormat": "FCP",
-          "queryType": "range",
+          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"lcp\"})",
           "refId": "A"
         }
       ],
-      "title": "First Contentful Paint (FCP)",
-      "type": "stat"
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"lcp\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
     },
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1800
-              },
-              {
-                "color": "red",
-                "value": 3000
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 32
-      },
-      "id": 11,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["mean", "max", "p95"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.0",
+      "title": "Web Vitals (FID)",
+      "type": "gauge",
+      "gridPos": { "x": 6, "y": 32, "w": 6, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | measurement.type=\"web-vitals\" | measurement.name=\"inp\" | __error__=\"\" | unwrap measurement.value [5m])",
-          "legendFormat": "INP",
-          "queryType": "range",
+          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"fid\"})",
           "refId": "A"
         }
       ],
-      "title": "Interaction to Next Paint (INP)",
-      "type": "stat"
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"fid\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
+    },
+    {
+      "title": "Web Vitals (CLS)",
+      "type": "gauge",
+      "gridPos": { "x": 12, "y": 32, "w": 6, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"cls\"})",
+          "refId": "A"
+        }
+      ],
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"cls\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
+    },
+    {
+      "title": "Web Vitals (FCP)",
+      "type": "gauge",
+      "gridPos": { "x": 18, "y": 32, "w": 6, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"fcp\"})",
+          "refId": "A"
+        }
+      ],
+      "links": [
+        {
+          "title": "Open in Loki",
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"fcp\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ]
     }
   ],
   "refresh": "5s",
