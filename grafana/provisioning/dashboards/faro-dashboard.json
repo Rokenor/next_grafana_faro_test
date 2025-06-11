@@ -67,35 +67,80 @@
       "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
-          "mappings": [],
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "error": {
+                  "color": "red",
+                  "index": 0
+                },
+                "info": {
+                  "color": "blue",
+                  "index": 1
+                },
+                "warn": {
+                  "color": "orange",
+                  "index": 2
+                }
+              },
+              "type": "value"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
           },
           "unit": "short"
         },
         "overrides": []
       },
       "options": {
-        "colorMode": "value",
-        "graphMode": "line",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["mean", "max", "p95"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
+        "legend": { "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "pluginVersion": "10.0.0",
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "loki" },
           "editorMode": "code",
-          "expr": "count_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json [5m])",
-          "legendFormat": "Logs (count)",
+          "expr": "sum by (detected_level) (count_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | __error__=\"\" | detected_level=~\"(info|warn|error|unknown)\" [$__interval]))",
+          "legendFormat": "{{detected_level}}",
           "queryType": "range",
           "refId": "A"
         }
@@ -103,7 +148,7 @@
       "links": [
         {
           "title": "Open in Loki",
-          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"count_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json [5m])\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"{exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | __error__=\\\"\\\" | detected_level=~\\\"(info|warn|error|unknown)\\\"\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
         }
       ]
     },
@@ -157,7 +202,7 @@
     {
       "title": "Logs & Events",
       "type": "logs",
-      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 8 },
       "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
@@ -192,7 +237,7 @@
     {
       "title": "Errors",
       "type": "table",
-      "gridPos": { "x": 16, "y": 24, "w": 12, "h": 8 },
+      "gridPos": { "x": 0, "y": 32, "w": 24, "h": 8 },
       "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
@@ -213,72 +258,196 @@
     {
       "title": "Web Vitals (LCP)",
       "type": "gauge",
-      "gridPos": { "x": 0, "y": 32, "w": 6, "h": 8 },
+      "gridPos": { "x": 0, "y": 40, "w": 6, "h": 8 },
       "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2500 },
+              { "color": "red", "value": 4000 }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.0",
       "targets": [
         {
-          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"lcp\"})",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | __error__=\"\" | attributes_measurement_type=\"web-vitals\" | attributes_measurement_name=\"lcp\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])",
+          "legendFormat": "LCP",
+          "queryType": "range",
           "refId": "A"
         }
       ],
       "links": [
         {
           "title": "Open in Loki",
-          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"lcp\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | __error__=\\\"\\\" | attributes_measurement_type=\\\"web-vitals\\\" | attributes_measurement_name=\\\"lcp\\\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
         }
       ]
     },
     {
       "title": "Web Vitals (FID)",
       "type": "gauge",
-      "gridPos": { "x": 6, "y": 32, "w": 6, "h": 8 },
+      "gridPos": { "x": 6, "y": 40, "w": 6, "h": 8 },
       "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 100 },
+              { "color": "red", "value": 300 }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.0",
       "targets": [
         {
-          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"fid\"})",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | __error__=\"\" | attributes_measurement_type=\"web-vitals\" | attributes_measurement_name=\"fid\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])",
+          "legendFormat": "FID",
+          "queryType": "range",
           "refId": "A"
         }
       ],
       "links": [
         {
           "title": "Open in Loki",
-          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"fid\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | __error__=\\\"\\\" | attributes_measurement_type=\\\"web-vitals\\\" | attributes_measurement_name=\\\"fid\\\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
         }
       ]
     },
     {
       "title": "Web Vitals (CLS)",
       "type": "gauge",
-      "gridPos": { "x": 12, "y": 32, "w": 6, "h": 8 },
+      "gridPos": { "x": 12, "y": 40, "w": 6, "h": 8 },
       "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.1 },
+              { "color": "red", "value": 0.25 }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.0",
       "targets": [
         {
-          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"cls\"})",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | __error__=\"\" | attributes_measurement_type=\"web-vitals\" | attributes_measurement_name=\"cls\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])",
+          "legendFormat": "CLS",
+          "queryType": "range",
           "refId": "A"
         }
       ],
       "links": [
         {
           "title": "Open in Loki",
-          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"cls\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | __error__=\\\"\\\" | attributes_measurement_type=\\\"web-vitals\\\" | attributes_measurement_name=\\\"cls\\\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
         }
       ]
     },
     {
       "title": "Web Vitals (FCP)",
       "type": "gauge",
-      "gridPos": { "x": 18, "y": 32, "w": 6, "h": 8 },
+      "gridPos": { "x": 18, "y": 40, "w": 6, "h": 8 },
       "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1800 },
+              { "color": "red", "value": 3000 }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.0",
       "targets": [
         {
-          "expr": "avg by (service) (attributes[\"measurement.value\"]{service=\"$service\", attributes[\"measurement.name\"]=\"fcp\"})",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "avg_over_time({exporter=\"OTLP\", job=\"nextjs-monitoring-demo\"} | json | __error__=\"\" | attributes_measurement_type=\"web-vitals\" | attributes_measurement_name=\"fcp\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])",
+          "legendFormat": "FCP",
+          "queryType": "range",
           "refId": "A"
         }
       ],
       "links": [
         {
           "title": "Open in Loki",
-          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg by (service) (attributes[\\\"measurement.value\\\"]{service=\\\"$service\\\", attributes[\\\"measurement.name\\\"]=\\\"fcp\\\"})\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+          "url": "http://localhost:3100/explore?orgId=1&left={\"datasource\":\"loki\",\"queries\":[{\"expr\":\"avg_over_time({exporter=\\\"OTLP\\\", job=\\\"nextjs-monitoring-demo\\\"} | json | __error__=\\\"\\\" | attributes_measurement_type=\\\"web-vitals\\\" | attributes_measurement_name=\\\"fcp\\\" | attributes_measurement_value >= 0 | unwrap attributes_measurement_value [$__auto])\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
         }
       ]
     }
