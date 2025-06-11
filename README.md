@@ -5,7 +5,11 @@ This project demonstrates how to integrate Grafana Faro for frontend application
 ## Features
 
 - Real-time error tracking and reporting
-- Performance monitoring
+- Performance monitoring with Web Vitals metrics:
+  - LCP (Largest Contentful Paint)
+  - FID (First Input Delay)
+  - CLS (Cumulative Layout Shift)
+  - FCP (First Contentful Paint)
 - User session tracking
 - Custom event logging
 - Resource usage metrics
@@ -14,6 +18,40 @@ This project demonstrates how to integrate Grafana Faro for frontend application
   - OpenTelemetry Collector for data collection
   - Loki for log aggregation
   - Grafana for visualization
+
+## Recent Updates
+
+### Dashboard Improvements
+
+- Updated Web Vitals panels to use `avg_over_time` with `unwrap` for more accurate metrics
+- Improved query structure for all Web Vitals measurements:
+  ```logql
+  avg_over_time({exporter="OTLP", job="nextjs-monitoring-demo"} |
+    json |
+    __error__="" |
+    attributes_measurement_type="web-vitals" |
+    attributes_measurement_name="[metric]" |
+    attributes_measurement_value >= 0 |
+    unwrap attributes_measurement_value
+    [$__auto])
+  ```
+- Added proper error handling and logging for CLS testing
+- Configured Next.js image optimization for external images (picsum.photos)
+
+### CLS Testing
+
+Added a dedicated CLS test section that:
+
+- Dynamically loads images to provoke layout shifts
+- Includes placeholder content that changes on image load
+- Provides real-time CLS measurements
+- Logs CLS-related events and errors
+
+### Configuration Updates
+
+- Added Next.js image domain configuration for external images
+- Updated OpenTelemetry Collector configuration for Web Vitals
+- Improved error handling and logging in the frontend application
 
 ## Prerequisites
 
@@ -74,6 +112,17 @@ The application will be available at `http://localhost:3000`.
 - Processes and exports logs to Loki
 - Runs on port 4318 (HTTP) and 4317 (gRPC)
 - Configuration: `otel-collector-config.yaml`
+- Web Vitals processing:
+  ```yaml
+  transform:
+    trace_statements:
+      - context: span
+        statements:
+          - set(attributes["measurement.type"], "web-vitals")
+          - set(attributes["measurement.name"], attributes["name"])
+          - set(attributes["measurement.value"], attributes["value"])
+          - set(attributes["measurement.rating"], attributes["rating"])
+  ```
 
 ### Loki
 
@@ -81,6 +130,10 @@ The application will be available at `http://localhost:3000`.
 - Stores and indexes logs
 - Accessible at `http://localhost:3100`
 - Configuration: `loki-config.yaml`
+- Web Vitals query structure:
+  - Uses `avg_over_time` for stable metrics
+  - Proper value extraction with `unwrap`
+  - Automatic interval selection with `[$__auto]`
 
 ### Grafana
 
@@ -90,6 +143,12 @@ The application will be available at `http://localhost:3000`.
   - Username: `admin`
   - Password: `admin`
 - Pre-configured with Loki data source
+- Custom dashboard for Next.js monitoring
+- Web Vitals panels with thresholds:
+  - LCP: green < 2500ms, yellow 2500-4000ms, red > 4000ms
+  - FID: green < 100ms, yellow 100-300ms, red > 300ms
+  - CLS: green < 0.1, yellow 0.1-0.25, red > 0.25
+  - FCP: green < 1800ms, yellow 1800-3000ms, red > 3000ms
 
 ## Grafana Dashboard Setup
 
@@ -124,43 +183,6 @@ The application will be available at `http://localhost:3000`.
 └── README.md
 ```
 
-## Recent Changes
-
-### Dashboard Enhancements
-
-- Added new timeline panels for better log visualization:
-  - "Logs & Events (Timeline)" panel showing log frequency over time
-  - "Errors (Timeline)" panel with red line color for error visualization
-- Improved panel layout and organization:
-  - Service Activity panel spans full width at the top
-  - Timeline panels for logs and errors
-  - Detailed log and error tables below
-  - Web Vitals panels at the bottom
-- Added data links to all panels for quick access to Loki queries
-- Configured proper color schemes and thresholds for better visualization
-
-### Monitoring Improvements
-
-- Added test error generation functionality:
-  - Automatic error generation on component mount
-  - Manual error generation via button click
-  - Proper error level detection and logging
-- Enhanced log filtering and visualization:
-  - Improved log level detection
-  - Better error log filtering
-  - Structured log display in panels
-
-### Infrastructure Updates
-
-- Updated OpenTelemetry Collector configuration:
-  - Added proper CORS support for browser requests
-  - Configured endpoints to bind to all interfaces (0.0.0.0)
-  - Added health check and zpages extensions
-  - Improved logging configuration
-- Added Docker Compose setup for complete observability stack
-- Integrated Loki for log aggregation
-- Pre-configured Grafana with Loki data source and dashboard
-
 ## Testing the Monitoring
 
 The demo page includes interactive elements to test the monitoring:
@@ -183,6 +205,21 @@ The demo page includes interactive elements to test the monitoring:
    - A test error is automatically generated when the page loads
    - This helps verify the monitoring setup is working correctly
 
+## Testing Web Vitals
+
+### CLS Testing
+
+1. Navigate to the CLS test section
+2. Click "Show CLS Content" to load dynamic content
+3. Watch the layout shifts as images load
+4. Monitor CLS values in the Grafana dashboard
+
+### Other Web Vitals
+
+- LCP: Monitored automatically on page load
+- FID: Tested through button interactions
+- FCP: Measured during initial page render
+
 ## Troubleshooting
 
 ### Common Issues
@@ -199,9 +236,33 @@ The demo page includes interactive elements to test the monitoring:
    - Verify the collector is listening on port 4318
 
 3. **No logs in Grafana**
+
    - Verify Loki is running: `docker logs loki`
    - Check if logs are reaching the collector
    - Ensure the Loki data source is configured in Grafana
+
+4. **No Web Vitals Data**
+
+   - Check browser console for Faro initialization
+   - Verify OpenTelemetry Collector is receiving data
+   - Ensure proper query structure in Grafana panels
+
+5. **High CLS Values**
+
+   - Review dynamic content loading
+   - Check image dimensions and loading strategy
+   - Monitor layout shifts in browser DevTools
+
+6. **Dashboard Issues**
+
+   - Verify Loki data source connection
+   - Check query syntax in panel configurations
+   - Ensure proper time range selection
+
+7. **Image Loading Errors**
+   - Verify Next.js image configuration
+   - Check allowed domains in `next.config.ts`
+   - Monitor network requests in browser DevTools
 
 ## Learn More
 
